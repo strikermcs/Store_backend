@@ -5,8 +5,15 @@ const User = sequlize.define('user', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     email: {type: DataTypes.STRING, unique: true},
     password: {type: DataTypes.STRING},
-    role:{type: DataTypes.STRING, defaultValue: "USER"}
+    role:{type: DataTypes.STRING, defaultValue: "USER"},
+    isActivated: {type: DataTypes.BOOLEAN, defaultValue: false},
+    activationLink: {type: DataTypes.STRING}
 
+})
+
+const Token = sequlize.define('user_token',{
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    refreshToken: {type: DataTypes.STRING, allowNull: false}
 })
 
 const Basket = sequlize.define('basket', {
@@ -29,6 +36,11 @@ const Device = sequlize.define('device', {
     rating: {type: DataTypes.INTEGER, defaultValue: 0},
     img: {type: DataTypes.STRING, allowNull: false}
     
+})
+
+const DeviceImage = sequlize.define('device_image',{
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    img: {type: DataTypes.STRING, allowNull: false}
 })
 
 const Type = sequlize.define('type', {
@@ -64,6 +76,9 @@ const TypeBrand = sequlize.define('type_brand', {
 User.hasOne(Basket)
 Basket.belongsTo(User)
 
+User.hasOne(Token)
+Token.belongsTo(User)
+
 User.hasMany(Rating)
 Rating.belongsTo(User)
 
@@ -85,6 +100,9 @@ BasketDevice.belongsTo(Device)
 Device.hasMany(DeviceInfo, {as: 'info'})
 DeviceInfo.belongsTo(Device)
 
+Device.hasMany(DeviceImage)
+DeviceImage.belongsTo(Device)
+
 Type.belongsToMany(Brand, {through: TypeBrand})
 Brand.belongsToMany(Type, {through: TypeBrand})
 
@@ -98,5 +116,7 @@ module.exports = {
     Brand,
     Rating,
     TypeBrand,
-    DeviceInfo
+    DeviceInfo,
+    Token,
+    DeviceImage
 }

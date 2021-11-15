@@ -5,6 +5,10 @@ class ApiError extends Error {
         this.message = message
     }
 
+    static UnauthorizedError(){
+        return new ApiError(401, 'Пользователь не авторизован')
+    }
+
     static badRequest(message){
         return new ApiError(404, message)
     }
@@ -15,6 +19,10 @@ class ApiError extends Error {
 
     static forbidden(message){
         return new ApiError(403, message)
+    }
+
+    static conflict(message){
+        return new ApiError(400, message)
     }
 }
 
