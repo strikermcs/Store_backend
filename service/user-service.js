@@ -42,11 +42,11 @@ class UserService{
     async login(email, password){
         const user = await User.findOne({where: {email}})
         if(!user){
-            throw ApiError.badRequest('Пользователь с таким email не найден')
+            throw ApiError.badUser('Пользователь с таким email не найден')
         }
         const isPassEquals = await bcrypt.compare(password, user.password)
         if(!isPassEquals){
-            throw ApiError.badRequest('Неверный пароль')
+            throw ApiError.badPassword('Неверный пароль')
         }
         const userDto = new UserDto(user)
         const tokens = tokenService.generateTokens({...userDto})
@@ -61,16 +61,22 @@ class UserService{
         return token
     }    
     
-    async refresh(refreshToken){
+    async refresh(refreshToken) {
+      
         if(!refreshToken){
             throw ApiError.UnauthorizedError()
         }
+        
         const userData = tokenService.validateRefreshToken(refreshToken)
+        
         const tokenFromDb = await tokenService.findToken(refreshToken)
+       
         if(!userData || !tokenFromDb){
             throw ApiError.UnauthorizedError()
         }
-        const user = await User.find({where: {id: userData.id}})
+         
+        const user = await User.findOne({ where: {id: userData.id}})
+       
         const userDto = new UserDto(user)
         const tokens = tokenService.generateTokens({...userDto})
         await tokenService.saveToken(userDto.id, tokens.refreshToken)
